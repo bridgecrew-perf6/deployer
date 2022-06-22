@@ -1,14 +1,21 @@
 from models.QuestDbDeployment import QuestDbDeployment
+from models.QuestDbDeploymentStatus import QuestDbDeploymentStatus
+from services import CreationService, DeletionService
+from repositories import QuestDbDeploymentRepo
 from uuid import UUID
 
 
 async def create() -> QuestDbDeployment:
-    raise Exception("Not implemented")
+    scheduled_deployment = await QuestDbDeploymentRepo.create()
+    pending_deployment = await CreationService.create(scheduled_deployment)
+    return pending_deployment
 
 
 async def delete(deployment_id: UUID) -> QuestDbDeployment:
-    raise Exception("Not implemented")
+    scheduled_deletion_deployment = await QuestDbDeploymentRepo.update_status(deployment_id, QuestDbDeploymentStatus.DELETION_SCHEDULED)
+    pending_deletion_deployment = await DeletionService.delete(scheduled_deletion_deployment)
+    return pending_deletion_deployment
 
 
 async def get(deployment_id: UUID) -> QuestDbDeployment:
-    raise Exception("Not implemented")
+    return await QuestDbDeploymentRepo.get(deployment_id)
