@@ -1,9 +1,10 @@
+from dataclasses import replace
+from typing import Callable
+from uuid import UUID
+
 from models.QuestDbDeployment import QuestDbDeployment
 from models.QuestDbDeploymentStatus import QuestDbDeploymentStatus
 from models.k8s.K8sMetadata import K8sMetadata
-from uuid import UUID
-from typing import Callable
-from dataclasses import replace
 
 deployments: dict[UUID, QuestDbDeployment] = {}
 
@@ -32,7 +33,7 @@ async def update_status(deployment_id: UUID, status: QuestDbDeploymentStatus) ->
     deployment = deployments[deployment_id]
     if deployment is None: raise Exception(f"Deployment with id {deployment_id} not found")
 
-    updated_deployment = replace(deployment, status = status)
+    updated_deployment = replace(deployment, status=status)
     deployments[deployment_id] = updated_deployment
 
     return updated_deployment
@@ -42,7 +43,7 @@ async def update_metadata(deployment_id: UUID, metadata: K8sMetadata) -> QuestDb
     deployment = deployments[deployment_id]
     if deployment is None: raise Exception(f"Deployment with id {deployment_id} not found")
 
-    updated_deployment = replace(deployment, k8s_metadata = metadata)
+    updated_deployment = replace(deployment, k8s_metadata=metadata)
     deployments[deployment_id] = updated_deployment
 
     return updated_deployment

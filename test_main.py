@@ -1,7 +1,8 @@
 from fastapi.testclient import TestClient
+
+from main import app
 from models.QuestDbDeployment import QuestDbDeployment
 from models.QuestDbDeploymentStatus import QuestDbDeploymentStatus
-from main import app
 
 client = TestClient(app)
 

@@ -1,5 +1,5 @@
+from models.k8s.deployment import K8sDeployment, K8sDeploymentConfig
 from models.k8s.namespace import K8sNamespace
-from models.k8s.deployment import K8sDeployment,K8sDeploymentConfig
 
 
 async def create(namespace: K8sNamespace, config: K8sDeploymentConfig) -> K8sDeployment:

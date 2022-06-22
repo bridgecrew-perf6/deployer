@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 from datetime import datetime
-from .K8sDeploymentStatus import K8sDeploymentStatus
+
 from .K8sDeploymentConfig import K8sDeploymentConfig
+from .K8sDeploymentStatus import K8sDeploymentStatus
 
 
 @dataclass

@@ -1,6 +1,7 @@
 from dataclasses import dataclass
-from .K8sNamespacePhase import K8sNamespacePhase
 from datetime import datetime
+
+from .K8sNamespacePhase import K8sNamespacePhase
 
 
 @dataclass

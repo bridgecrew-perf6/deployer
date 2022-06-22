@@ -1,8 +1,9 @@
+from uuid import UUID
+
 from models.QuestDbDeployment import QuestDbDeployment
 from models.QuestDbDeploymentStatus import QuestDbDeploymentStatus
-from services import CreationService, DeletionService
 from repositories import QuestDbDeploymentRepo
-from uuid import UUID
+from services import CreationService, DeletionService
 
 
 async def create() -> QuestDbDeployment:
@@ -12,7 +13,8 @@ async def create() -> QuestDbDeployment:
 
 
 async def delete(deployment_id: UUID) -> QuestDbDeployment:
-    scheduled_deletion_deployment = await QuestDbDeploymentRepo.update_status(deployment_id, QuestDbDeploymentStatus.DELETION_SCHEDULED)
+    scheduled_deletion_deployment = await QuestDbDeploymentRepo.update_status(deployment_id,
+                                                                              QuestDbDeploymentStatus.DELETION_SCHEDULED)
     pending_deletion_deployment = await DeletionService.delete(scheduled_deletion_deployment)
     return pending_deletion_deployment
 

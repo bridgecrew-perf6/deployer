@@ -1,7 +1,9 @@
-from fastapi import FastAPI
-from models.QuestDbDeployment import QuestDbDeployment
-import services.AppService as AppService
 from uuid import UUID
+
+from fastapi import FastAPI
+
+import services.AppService as AppService
+from models.QuestDbDeployment import QuestDbDeployment
 
 app = FastAPI()
 

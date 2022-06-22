@@ -1,9 +1,10 @@
+from dataclasses import replace
 from unittest import IsolatedAsyncioTestCase
 from unittest.mock import patch
+
 import services.AppService as AppService
 from models.QuestDbDeployment import QuestDbDeployment
 from models.QuestDbDeploymentStatus import QuestDbDeploymentStatus
-from dataclasses import replace
 
 
 class AppServiceTest(IsolatedAsyncioTestCase):
@@ -14,7 +15,7 @@ class AppServiceTest(IsolatedAsyncioTestCase):
         deployment = QuestDbDeployment()
         repo_create.return_value = deployment
 
-        resulting_deployment = replace(deployment, status = QuestDbDeploymentStatus.CREATION_PENDING)
+        resulting_deployment = replace(deployment, status=QuestDbDeploymentStatus.CREATION_PENDING)
         creation_service.return_value = resulting_deployment
 
         result = await AppService.create()
@@ -26,10 +27,10 @@ class AppServiceTest(IsolatedAsyncioTestCase):
     @patch("repositories.QuestDbDeploymentRepo.update_status")
     @patch("services.DeletionService.delete")
     async def test_delete_should_update_status_and_start_deletion(self, deletion_service, repo_update_status):
-        deployment = QuestDbDeployment(status = QuestDbDeploymentStatus.DELETION_SCHEDULED)
+        deployment = QuestDbDeployment(status=QuestDbDeploymentStatus.DELETION_SCHEDULED)
         repo_update_status.return_value = deployment
 
-        resulting_deployment = replace(deployment, status = QuestDbDeploymentStatus.DELETION_PENDING)
+        resulting_deployment = replace(deployment, status=QuestDbDeploymentStatus.DELETION_PENDING)
         deletion_service.return_value = resulting_deployment
 
         result = await AppService.delete(deployment.id)

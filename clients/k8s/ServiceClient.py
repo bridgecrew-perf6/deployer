@@ -1,8 +1,8 @@
 from models.k8s.namespace import K8sNamespace
-from models.k8s.service import K8sService, K8sServiceConfig
+from models.k8s.service import K8sService
 
 
-async def create(namespace: K8sNamespace, config: K8sServiceConfig) -> K8sService:
+async def create(namespace: K8sNamespace) -> K8sService:
     raise Exception("Not implemented")
 
 
