@@ -2,7 +2,5 @@ from dataclasses import dataclass
 
 
 @dataclass
-class K8sDeploymentConfig:
-    memory: str
-    cpu: str
+class K8sVolumeClaimConfig:
     storage: str
