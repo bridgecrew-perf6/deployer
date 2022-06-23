@@ -9,7 +9,7 @@ from services import CreationService, DeletionService
 async def create() -> QuestDbDeployment:
     scheduled_deployment = await QuestDbDeploymentRepo.create()
     pending_deployment = await CreationService.create(scheduled_deployment)
-    return pending_deployment
+    return pending_deployment.to_json()
 
 
 async def delete(deployment_id: UUID) -> QuestDbDeployment:

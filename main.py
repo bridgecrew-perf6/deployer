@@ -2,13 +2,17 @@ from uuid import UUID
 
 from fastapi import FastAPI
 
+from dotenv import load_dotenv
+
 import services.AppService as AppService
 from models.QuestDbDeployment import QuestDbDeployment
+
+load_dotenv()
 
 app = FastAPI()
 
 
-@app.post("/", response_model=QuestDbDeployment)
+@app.post("/")
 async def create_deployment():
     return await AppService.create()
 

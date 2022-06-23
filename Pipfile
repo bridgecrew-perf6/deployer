@@ -9,6 +9,9 @@ uvicorn = "==0.17.6"
 fastapi-utils = "*"
 kubernetes = "*"
 pytest = "*"
+python-dotenv = "*"
+kubernetes-asyncio = "*"
+dataclass-wizard = "*"
 
 [dev-packages]
 

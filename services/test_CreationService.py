@@ -19,7 +19,7 @@ from models.k8s.volume_claim.K8sVolumeClaimConfig import K8sVolumeClaimConfig
 
 def get_deployment_with_namespace():
     deployment = QuestDbDeployment()
-    namespace = K8sNamespace(str(deployment.id), K8sNamespacePhase.ACTIVE)
+    namespace = K8sNamespace(str(deployment.id), K8sNamespacePhase.Active)
     metadata = replace(deployment.k8s_metadata, namespace=namespace)
     return replace(deployment, k8s_metadata=metadata)
 
@@ -66,7 +66,7 @@ class CreationServiceTest(IsolatedAsyncioTestCase):
     async def test_create_namespace_should_call_client_and_persist_result(self, update_metadata,
                                                                           create_namespace_client):
         deployment = QuestDbDeployment()
-        namespace = K8sNamespace(str(deployment.id), K8sNamespacePhase.ACTIVE)
+        namespace = K8sNamespace(str(deployment.id), K8sNamespacePhase.Active)
         updated_deployment = replace(deployment, k8s_metadata=replace(deployment.k8s_metadata, namespace=namespace))
 
         create_namespace_client.return_value = namespace
@@ -124,7 +124,7 @@ class CreationServiceTest(IsolatedAsyncioTestCase):
         deployment_config = K8sDeploymentConfig(
             cpu=deployment.k8s_metadata.resource_quota.config.cpu,
             memory=deployment.k8s_metadata.resource_quota.config.memory,
-            storage=deployment.k8s_metadata.volume_claim.config.storage,
+            claim_name=deployment.k8s_metadata.volume_claim.config.storage,
         )
         k8s_deployment = K8sDeployment(str(deployment.id), K8sDeploymentStatus.PROGRESSING, deployment_config)
         updated_deployment = replace(deployment,

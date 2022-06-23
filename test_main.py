@@ -9,8 +9,9 @@ client = TestClient(app)
 
 def test_create_deployment():
     response = client.post("/")
+    deployment = QuestDbDeployment.from_json(response.json())
     assert response.status_code == 200
-    assert response.json() == QuestDbDeployment()
+    assert deployment.status == QuestDbDeploymentStatus.CREATION_SCHEDULED
 
 
 def test_delete_deployment():

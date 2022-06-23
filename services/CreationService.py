@@ -23,7 +23,7 @@ async def create_namespace(deployment: QuestDbDeployment) -> QuestDbDeployment:
 
 
 async def create_resource_quota(deployment: QuestDbDeployment) -> QuestDbDeployment:
-    quota_config = K8sResourceQuotaConfig("1000", "1Gi")
+    quota_config = K8sResourceQuotaConfig(memory="1Gi", cpu="2")
     resource_quota = await ResourceQuotaClient.create(deployment.k8s_metadata.namespace.name, quota_config)
     return await QuestDbDeploymentRepo.update_metadata(deployment.id,
                                                        replace(deployment.k8s_metadata, resource_quota=resource_quota))
@@ -40,7 +40,7 @@ async def create_deployment(deployment: QuestDbDeployment) -> QuestDbDeployment:
     deployment_config = K8sDeploymentConfig(
         cpu=deployment.k8s_metadata.resource_quota.config.cpu,
         memory=deployment.k8s_metadata.resource_quota.config.memory,
-        storage=deployment.k8s_metadata.volume_claim.config.storage,
+        claim_name=deployment.k8s_metadata.volume_claim.id,
     )
     k8s_deployment = await DeploymentClient.create(deployment.k8s_metadata.namespace.name, deployment_config)
     return await QuestDbDeploymentRepo.update_metadata(deployment.id,

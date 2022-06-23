@@ -20,7 +20,7 @@ from models.k8s.volume_claim.K8sVolumeClaimConfig import K8sVolumeClaimConfig
 def get_created_deployment():
     deployment = QuestDbDeployment()
 
-    namespace = K8sNamespace(str(deployment.id), K8sNamespacePhase.ACTIVE)
+    namespace = K8sNamespace(str(deployment.id), K8sNamespacePhase.Active)
 
     resource_quota_config = K8sResourceQuotaConfig("1000", "1Gi")
     resource_quota = K8sResourceQuota(str(deployment.id), resource_quota_config)
@@ -142,7 +142,7 @@ class DeletionServiceTest(IsolatedAsyncioTestCase):
     async def test_delete_namespace_should_call_client_and_persist_result(self, update_metadata,
                                                                           delete_namespace_client):
         deployment = QuestDbDeployment()
-        namespace = K8sNamespace(str(deployment.id), K8sNamespacePhase.TERMINATING)
+        namespace = K8sNamespace(str(deployment.id), K8sNamespacePhase.Terminating)
         updated_deployment = replace(deployment, k8s_metadata=replace(deployment.k8s_metadata, namespace=namespace))
 
         delete_namespace_client.return_value = namespace

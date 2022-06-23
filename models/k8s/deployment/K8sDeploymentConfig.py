@@ -1,8 +1,10 @@
 from dataclasses import dataclass
 
+from dataclass_wizard import JSONWizard
+
 
 @dataclass
-class K8sDeploymentConfig:
+class K8sDeploymentConfig(JSONWizard):
     memory: str
     cpu: str
-    storage: str
+    claim_name: str
