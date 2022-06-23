@@ -2,8 +2,8 @@ from dataclasses import replace
 
 from clients.k8s import NamespaceClient, ResourceQuotaClient, VolumeClaimClient, DeploymentClient, ServiceClient
 from models.QuestDbDeployment import QuestDbDeployment
-from models.k8s.resource_quota.K8sResourceQuotaConfig import K8sResourceQuotaConfig
 from models.k8s.deployment.K8sDeploymentConfig import K8sDeploymentConfig
+from models.k8s.resource_quota.K8sResourceQuotaConfig import K8sResourceQuotaConfig
 from models.k8s.volume_claim.K8sVolumeClaimConfig import K8sVolumeClaimConfig
 from repositories import QuestDbDeploymentRepo
 
