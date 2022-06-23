@@ -19,9 +19,5 @@ async def create(namespace: str, config: K8sResourceQuotaConfig) -> K8sResourceQ
     return K8sResourceQuota(id=response.metadata.name, config=config)
 
 
-async def delete(namespace: str, quota_id: str) -> K8sResourceQuota:
-    raise Exception("Not implemented")
-
-
 async def read(namespace: str, quota_id: str) -> K8sResourceQuota:
     raise Exception("Not implemented")

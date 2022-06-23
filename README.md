@@ -12,19 +12,22 @@
 2. Expose minikube ports to control `kubectl proxy --port 8080` (to be available on default host `localhost:8080`)
 3. Start the app: `uvicorn main:app --reload`
 
-## Creating cluster
-
-Run `curl -XPOST localhost:8000`
-
-## Getting cluster info
-
-Run `curl localhost:8000/{cluster-uuid}`
-
-## Deleting cluster
-
-Run `curl -XDELETE localhost:8000/{cluster-uuid}`
-
-
 ## Running tests
 
 Run `pytest`
+
+## Using
+
+### Creating cluster
+
+Run `curl -XPOST localhost:8000`
+
+Cluster becomes available
+
+### Getting cluster info
+
+Run `curl localhost:8000/{cluster-uuid}`
+
+### Deleting cluster
+
+Run `curl -XDELETE localhost:8000/{cluster-uuid}`

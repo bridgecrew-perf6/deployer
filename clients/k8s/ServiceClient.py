@@ -18,9 +18,5 @@ async def create(namespace: str) -> K8sService:
                       config=K8sServiceConfig(node_port=str(response.spec.ports[0].node_port)))
 
 
-async def delete(namespace: str, service_id: str) -> K8sService:
-    raise Exception("Not implemented")
-
-
 async def read(namespace: str, service_id: str) -> K8sService:
     raise Exception("Not implemented")

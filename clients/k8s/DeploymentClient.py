@@ -24,10 +24,6 @@ async def create(namespace: str, config: K8sDeploymentConfig) -> K8sDeployment:
     return K8sDeployment(id=response.metadata.name, config=config, status=status)
 
 
-async def delete(namespace: str, deployment_id: str) -> K8sDeployment:
-    raise Exception("Not implemented")
-
-
 async def read(namespace: str, deployment_id: str) -> K8sDeployment:
     raise Exception("Not implemented")
 

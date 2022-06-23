@@ -45,111 +45,22 @@ def get_created_deployment():
 
 class DeletionServiceTest(IsolatedAsyncioTestCase):
 
-    @patch("services.DeletionService.delete_service")
-    @patch("services.DeletionService.delete_deployment")
-    @patch("services.DeletionService.delete_volume_claim")
-    @patch("services.DeletionService.delete_resource_quota")
-    @patch("services.DeletionService.delete_namespace")
-    async def test_delete_should_call_creation_steps(self, delete_namespace, delete_quota, delete_claim,
-                                                     delete_deployment,
-                                                     delete_service):
-        deployment = QuestDbDeployment()
-
-        delete_namespace.return_value = deployment
-        delete_quota.return_value = deployment
-        delete_claim.return_value = deployment
-        delete_deployment.return_value = deployment
-        delete_service.return_value = deployment
-
-        await DeletionService.delete(deployment)
-
-        delete_service.assert_called_once_with(deployment)
-        delete_deployment.assert_called_once_with(deployment)
-        delete_claim.assert_called_once_with(deployment)
-        delete_quota.assert_called_once_with(deployment)
-        delete_namespace.assert_called_once_with(deployment)
-
-    @patch("clients.k8s.ServiceClient.delete")
-    @patch("repositories.QuestDbDeploymentRepo.update_metadata")
-    async def test_delete_service_should_call_client_and_persist_result(self, update_metadata,
-                                                                        delete_service_client):
-        deployment = get_created_deployment()
-        updated_deployment = replace(deployment,
-                                     k8s_metadata=replace(deployment.k8s_metadata, service=None))
-
-        update_metadata.return_value = updated_deployment
-
-        result = await DeletionService.delete_service(deployment)
-
-        delete_service_client.assert_called_once_with(deployment.k8s_metadata.namespace.name,
-                                                      deployment.k8s_metadata.service.id)
-        update_metadata.assert_called_once_with(updated_deployment.id, updated_deployment.k8s_metadata)
-        self.assertEqual(result, updated_deployment)
-
-    @patch("clients.k8s.DeploymentClient.delete")
-    @patch("repositories.QuestDbDeploymentRepo.update_metadata")
-    async def test_delete_deployment_should_call_client_and_persist_result(self, update_metadata,
-                                                                           delete_deployment_client):
-        deployment = get_created_deployment()
-        updated_deployment = replace(deployment,
-                                     k8s_metadata=replace(deployment.k8s_metadata, deployment=None))
-
-        update_metadata.return_value = updated_deployment
-
-        result = await DeletionService.delete_deployment(deployment)
-
-        delete_deployment_client.assert_called_once_with(deployment.k8s_metadata.namespace.name,
-                                                         deployment.k8s_metadata.deployment.id)
-        update_metadata.assert_called_once_with(updated_deployment.id, updated_deployment.k8s_metadata)
-        self.assertEqual(result, updated_deployment)
-
-    @patch("clients.k8s.VolumeClaimClient.delete")
-    @patch("repositories.QuestDbDeploymentRepo.update_metadata")
-    async def test_delete_volume_claim_should_call_client_and_persist_result(self, update_metadata,
-                                                                             delete_claim_client):
-        deployment = get_created_deployment()
-        updated_deployment = replace(deployment,
-                                     k8s_metadata=replace(deployment.k8s_metadata, volume_claim=None))
-
-        update_metadata.return_value = updated_deployment
-
-        result = await DeletionService.delete_volume_claim(deployment)
-
-        delete_claim_client.assert_called_once_with(deployment.k8s_metadata.namespace.name,
-                                                    deployment.k8s_metadata.volume_claim.id)
-        update_metadata.assert_called_once_with(updated_deployment.id, updated_deployment.k8s_metadata)
-        self.assertEqual(result, updated_deployment)
-
-    @patch("clients.k8s.ResourceQuotaClient.delete")
-    @patch("repositories.QuestDbDeploymentRepo.update_metadata")
-    async def test_delete_resource_quota_should_call_client_and_persist_result(self, update_metadata,
-                                                                               delete_quota_client):
-        deployment = get_created_deployment()
-        updated_deployment = replace(deployment,
-                                     k8s_metadata=replace(deployment.k8s_metadata, resource_quota=None))
-
-        update_metadata.return_value = updated_deployment
-
-        result = await DeletionService.delete_resource_quota(deployment)
-
-        delete_quota_client.assert_called_once_with(deployment.k8s_metadata.namespace.name,
-                                                    deployment.k8s_metadata.resource_quota.id)
-        update_metadata.assert_called_once_with(updated_deployment.id, updated_deployment.k8s_metadata)
-        self.assertEqual(result, updated_deployment)
-
     @patch("clients.k8s.NamespaceClient.delete")
     @patch("repositories.QuestDbDeploymentRepo.update_metadata")
-    async def test_delete_namespace_should_call_client_and_persist_result(self, update_metadata,
-                                                                          delete_namespace_client):
-        deployment = QuestDbDeployment()
-        namespace = K8sNamespace(str(deployment.id), K8sNamespacePhase.Terminating)
-        updated_deployment = replace(deployment, k8s_metadata=replace(deployment.k8s_metadata, namespace=namespace))
+    async def test_delete_should_call_namespace_deletion_client_and_persist_state(self, update_metadata,
+                                                                                  delete_service_client):
+        deployment = get_created_deployment()
+        namespace = replace(deployment.k8s_metadata.namespace, phase=K8sNamespacePhase.Terminating)
+        updated_deployment = replace(deployment,
+                                     k8s_metadata=replace(
+                                         deployment.k8s_metadata, namespace=namespace,
+                                         service=None, deployment=None, volume_claim=None, resource_quota=None))
 
-        delete_namespace_client.return_value = namespace
+        delete_service_client.return_value = namespace
         update_metadata.return_value = updated_deployment
 
-        result = await DeletionService.delete_namespace(deployment)
+        result = await DeletionService.delete(deployment)
 
-        delete_namespace_client.assert_called_once_with(namespace.name)
+        delete_service_client.assert_called_once_with(deployment.k8s_metadata.namespace.name)
         update_metadata.assert_called_once_with(updated_deployment.id, updated_deployment.k8s_metadata)
         self.assertEqual(result, updated_deployment)

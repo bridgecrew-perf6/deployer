@@ -18,9 +18,5 @@ async def create(namespace: str, config: K8sVolumeClaimConfig) -> K8sVolumeClaim
     return K8sVolumeClaim(id=response.metadata.name, config=config)
 
 
-async def delete(namespace: str, claim_id: str) -> K8sVolumeClaim:
-    raise Exception("Not implemented")
-
-
 async def read(namespace: str, claim_id: str) -> K8sVolumeClaim:
     raise Exception("Not implemented")
