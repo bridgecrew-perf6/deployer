@@ -31,7 +31,8 @@ async def find_by_status(status: QuestDbDeploymentStatus) -> list[QuestDbDeploym
 
 async def update_status(deployment_id: UUID, status: QuestDbDeploymentStatus) -> QuestDbDeployment:
     deployment = deployments[deployment_id]
-    if deployment is None: raise Exception(f"Deployment with id {deployment_id} not found")
+    if deployment is None:
+        raise Exception(f"Deployment with id {deployment_id} not found")
 
     updated_deployment = replace(deployment, status=status)
     deployments[deployment_id] = updated_deployment
@@ -41,7 +42,8 @@ async def update_status(deployment_id: UUID, status: QuestDbDeploymentStatus) ->
 
 async def update_metadata(deployment_id: UUID, metadata: K8sMetadata) -> QuestDbDeployment:
     deployment = deployments[deployment_id]
-    if deployment is None: raise Exception(f"Deployment with id {deployment_id} not found")
+    if deployment is None:
+        raise Exception(f"Deployment with id {deployment_id} not found")
 
     updated_deployment = replace(deployment, k8s_metadata=metadata)
     deployments[deployment_id] = updated_deployment

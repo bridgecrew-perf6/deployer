@@ -10,7 +10,7 @@
 
 1. Run minikube with enough resources minikube: `minikube start --cpus 4 --memory 2000 --driver virtualbox`
 2. Expose minikube ports to control `kubectl proxy --port 8080` (to be available on default host `localhost:8080`)
-3. Start the app: `uvicorn main:app --reload`
+3. Start the app: `python main.py`
 
 ## Running tests
 
@@ -22,7 +22,10 @@ Run `pytest`
 
 Run `curl -XPOST localhost:8000`
 
-Cluster becomes available
+QuestDB becomes available at minikube ips on NodePort port
+
+1. NodePort is available in the response JSON
+2. IP can be checked with `minikube ip`
 
 ### Getting cluster info
 

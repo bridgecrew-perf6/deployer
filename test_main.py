@@ -15,10 +15,10 @@ def test_create_deployment():
 
 
 def test_delete_deployment():
-    deployment: QuestDbDeployment = client.post("/").json()
+    deployment = QuestDbDeployment.from_json(client.post("/").json())
 
     response = client.delete(f"/{deployment.id}")
-    deleted_deployment: QuestDbDeployment = response.json()
+    deleted_deployment: QuestDbDeployment = QuestDbDeployment.from_json(response.json())
 
     assert response.status_code == 200
     assert deleted_deployment.id == deployment.id

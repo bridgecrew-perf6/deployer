@@ -12,8 +12,8 @@ from .QuestDbDeploymentStatus import QuestDbDeploymentStatus
 class QuestDbDeployment(JSONWizard):
     status_log: list[QuestDbDeploymentStatus] = field(
         default_factory=lambda: [QuestDbDeploymentStatus.CREATION_SCHEDULED])
-    id: UUID = uuid4()
+    id: UUID = field(default_factory=lambda: uuid4())
     status: QuestDbDeploymentStatus = QuestDbDeploymentStatus.CREATION_SCHEDULED
-    k8s_metadata: K8sMetadata = K8sMetadata()
-    inserted_at: datetime = datetime.now()
-    updated_at: datetime = datetime.now()
+    k8s_metadata: K8sMetadata = field(default_factory=lambda: K8sMetadata())
+    inserted_at: datetime = field(default_factory=lambda: datetime.now())
+    updated_at: datetime = field(default_factory=lambda: datetime.now())

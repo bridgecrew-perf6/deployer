@@ -16,8 +16,8 @@ async def delete(deployment_id: UUID) -> QuestDbDeployment:
     scheduled_deletion_deployment = await QuestDbDeploymentRepo.update_status(deployment_id,
                                                                               QuestDbDeploymentStatus.DELETION_SCHEDULED)
     pending_deletion_deployment = await DeletionService.delete(scheduled_deletion_deployment)
-    return pending_deletion_deployment
+    return pending_deletion_deployment.to_json()
 
 
 async def get(deployment_id: UUID) -> QuestDbDeployment:
-    return await QuestDbDeploymentRepo.get(deployment_id)
+    return (await QuestDbDeploymentRepo.get(deployment_id)).to_json()
