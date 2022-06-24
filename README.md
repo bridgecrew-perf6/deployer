@@ -27,9 +27,13 @@ QuestDB becomes available at minikube ips on NodePort port
 1. NodePort is available in the response JSON
 2. IP can be checked with `minikube ip`
 
-### Getting cluster info
+### Getting deployment info
 
 Run `curl localhost:8000/{cluster-uuid}`
+
+### Getting deployment status
+
+Run `curl localhost:8000/{cluster-uuid}/status`
 
 ### Deleting cluster
 
