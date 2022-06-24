@@ -1,6 +1,7 @@
 from copy import deepcopy
 
 from kubernetes_asyncio.client import V1ResourceQuota
+from kubernetes_asyncio.client.exceptions import ApiException
 
 from models.k8s.resource_quota.K8sResourceQuota import K8sResourceQuota
 from models.k8s.resource_quota.K8sResourceQuotaConfig import K8sResourceQuotaConfig
@@ -19,5 +20,16 @@ async def create(namespace: str, config: K8sResourceQuotaConfig) -> K8sResourceQ
     return K8sResourceQuota(id=response.metadata.name, config=config)
 
 
-async def read(namespace: str, quota_id: str) -> K8sResourceQuota:
-    raise Exception("Not implemented")
+async def refresh(namespace: str, quota: K8sResourceQuota | None) -> K8sResourceQuota | None:
+    if quota is None: return None
+
+    core_client = get_core_client()
+    try:
+        await core_client.read_namespaced_resource_quota(quota.id, namespace)
+    except ApiException as error:
+        if error.status == 404:
+            return None
+        else:
+            raise error
+
+    return quota

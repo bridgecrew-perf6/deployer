@@ -1,6 +1,8 @@
 from copy import deepcopy
+from dataclasses import replace
 
 from kubernetes_asyncio.client import V1Deployment
+from kubernetes_asyncio.client.exceptions import ApiException
 
 from models.k8s.deployment.K8sDeployment import K8sDeployment
 from models.k8s.deployment.K8sDeploymentConfig import K8sDeploymentConfig
@@ -24,8 +26,20 @@ async def create(namespace: str, config: K8sDeploymentConfig) -> K8sDeployment:
     return K8sDeployment(id=response.metadata.name, config=config, status=status)
 
 
-async def read(namespace: str, deployment_id: str) -> K8sDeployment:
-    raise Exception("Not implemented")
+async def refresh(namespace: str, deployment: K8sDeployment | None) -> K8sDeployment | None:
+    if deployment is None: return None
+
+    apps_client = get_apps_client()
+    try:
+        response: V1Deployment = await apps_client.read_namespaced_deployment(deployment.id, namespace)
+    except ApiException as error:
+        if error.status == 404:
+            return None
+        else:
+            raise error
+
+    status = calculate_deployment_status(response)
+    return replace(deployment, status=status)
 
 
 def calculate_deployment_status(deployment_response: V1Deployment) -> K8sDeploymentStatus:
@@ -35,19 +49,19 @@ def calculate_deployment_status(deployment_response: V1Deployment) -> K8sDeploym
         return K8sDeploymentStatus.PROGRESSING
 
     if next((condition for condition in conditions if
-             condition['type'] == 'Progressing' and
-             condition['status'] == 'True' and
-             condition['reason'] == 'NewReplicaSetAvailable'), False):
+             condition.type == 'Progressing' and
+             condition.status == 'True' and
+             condition.reason == 'NewReplicaSetAvailable'), False):
         return K8sDeploymentStatus.COMPLETE
 
     if next((condition for condition in conditions if
-             condition['type'] == 'Progressing' and
-             condition['status'] == 'False'), False):
+             condition.type == 'Progressing' and
+             condition.status == 'False'), False):
         return K8sDeploymentStatus.FAILED
 
     if next((condition for condition in conditions if
-             condition['type'] == 'Available' and
-             condition['status'] == 'False'), False):
+             condition.type == 'Available' and
+             condition.status == 'False'), False):
         return K8sDeploymentStatus.FAILED
 
     return K8sDeploymentStatus.PROGRESSING

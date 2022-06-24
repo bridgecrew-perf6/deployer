@@ -15,24 +15,7 @@ from models.k8s.service.K8sService import K8sService
 from models.k8s.service.K8sServiceConfig import K8sServiceConfig
 from models.k8s.volume_claim.K8sVolumeClaim import K8sVolumeClaim
 from models.k8s.volume_claim.K8sVolumeClaimConfig import K8sVolumeClaimConfig
-
-
-def get_deployment_with_namespace():
-    deployment = QuestDbDeployment()
-    namespace = K8sNamespace(str(deployment.id), K8sNamespacePhase.Active)
-    metadata = replace(deployment.k8s_metadata, namespace=namespace)
-    return replace(deployment, k8s_metadata=metadata)
-
-
-def get_deployment_with_namespace_quota_and_volume_claim():
-    deployment = get_deployment_with_namespace()
-    resource_quota_config = K8sResourceQuotaConfig("1000", "1Gi")
-    resource_quota = K8sResourceQuota(str(deployment.id), resource_quota_config)
-
-    volume_claim_config = K8sVolumeClaimConfig("1Gi")
-    volume_claim = K8sVolumeClaim(str(deployment.id), volume_claim_config)
-    metadata = replace(deployment.k8s_metadata, volume_claim=volume_claim, resource_quota=resource_quota)
-    return replace(deployment, k8s_metadata=metadata)
+from services.testutils import get_deployment_with_namespace, get_deployment_with_namespace_quota_and_volume_claim
 
 
 class CreationServiceTest(IsolatedAsyncioTestCase):
@@ -83,7 +66,7 @@ class CreationServiceTest(IsolatedAsyncioTestCase):
     async def test_create_resource_quota_should_call_client_and_persist_result(self, update_metadata,
                                                                                create_quota_client):
         deployment = get_deployment_with_namespace()
-        resource_quota_config = K8sResourceQuotaConfig("1000", "1Gi")
+        resource_quota_config = K8sResourceQuotaConfig(cpu="2", memory="1Gi")
         resource_quota = K8sResourceQuota(str(deployment.id), resource_quota_config)
         updated_deployment = replace(deployment,
                                      k8s_metadata=replace(deployment.k8s_metadata, resource_quota=resource_quota))
@@ -124,7 +107,7 @@ class CreationServiceTest(IsolatedAsyncioTestCase):
         deployment_config = K8sDeploymentConfig(
             cpu=deployment.k8s_metadata.resource_quota.config.cpu,
             memory=deployment.k8s_metadata.resource_quota.config.memory,
-            claim_name=deployment.k8s_metadata.volume_claim.config.storage,
+            claim_name=deployment.k8s_metadata.volume_claim.id,
         )
         k8s_deployment = K8sDeployment(str(deployment.id), K8sDeploymentStatus.PROGRESSING, deployment_config)
         updated_deployment = replace(deployment,

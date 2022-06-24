@@ -1,12 +1,15 @@
 import json
 from copy import deepcopy
+from dataclasses import replace
 
-from kubernetes_asyncio.client import V1Status, V1Namespace, V1NamespaceStatus
+from kubernetes_asyncio.client import V1Status, V1Namespace
+from kubernetes_asyncio.client.exceptions import ApiException
 
 from models.k8s.namespace.K8sNamespace import K8sNamespace
 from models.k8s.namespace.K8sNamespacePhase import K8sNamespacePhase
 from .client import get_core_client
 from .templates import namespace_template
+
 
 async def create(name: str) -> K8sNamespace:
     template = deepcopy(namespace_template)
@@ -25,5 +28,16 @@ async def delete(name: str) -> K8sNamespace | None:
     return K8sNamespace(name=name, phase=K8sNamespacePhase[phase])
 
 
-async def read(name: str) -> K8sNamespace:
-    raise Exception("Not implemented")
+async def refresh(namespace: K8sNamespace | None) -> K8sNamespace | None:
+    if namespace is None: return None
+
+    core_client = get_core_client()
+    try:
+        response: V1Namespace = await core_client.read_namespace(namespace.name)
+    except ApiException as error:
+        if error.status == 404:
+            return None
+        else:
+            raise error
+
+    return replace(namespace, phase=K8sNamespacePhase[response.status.phase])

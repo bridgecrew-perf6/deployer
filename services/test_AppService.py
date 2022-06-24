@@ -22,7 +22,7 @@ class AppServiceTest(IsolatedAsyncioTestCase):
 
         repo_create.assert_called_once()
         creation_service.assert_called_once_with(deployment)
-        self.assertEqual(resulting_deployment, result)
+        self.assertEqual(resulting_deployment.to_json(), result)
 
     @patch("repositories.QuestDbDeploymentRepo.update_status")
     @patch("services.DeletionService.delete")
@@ -37,7 +37,7 @@ class AppServiceTest(IsolatedAsyncioTestCase):
 
         repo_update_status.assert_called_once_with(deployment.id, QuestDbDeploymentStatus.DELETION_SCHEDULED)
         deletion_service.assert_called_once_with(deployment)
-        self.assertEqual(resulting_deployment, result)
+        self.assertEqual(resulting_deployment.to_json(), result)
 
     @patch("repositories.QuestDbDeploymentRepo.get")
     async def test_get_should_return_entity(self, repo_get):
@@ -47,4 +47,4 @@ class AppServiceTest(IsolatedAsyncioTestCase):
         result = await AppService.get(deployment.id)
 
         repo_get.assert_called_once_with(deployment.id)
-        self.assertEqual(deployment, result)
+        self.assertEqual(deployment.to_json(), result)

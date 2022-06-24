@@ -21,3 +21,8 @@ async def delete(deployment_id: UUID) -> QuestDbDeployment:
 
 async def get(deployment_id: UUID) -> QuestDbDeployment:
     return (await QuestDbDeploymentRepo.get(deployment_id)).to_json()
+
+
+async def get_status(deployment_id: UUID):
+    deployment = (await QuestDbDeploymentRepo.get(deployment_id))
+    return { "status": deployment.status }

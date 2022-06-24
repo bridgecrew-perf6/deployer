@@ -17,14 +17,15 @@ async def create() -> QuestDbDeployment:
 
 async def get(deployment_id: UUID) -> QuestDbDeployment:
     deployment = deployments[deployment_id]
-    if deployment is None: raise Exception(f"Deployment with id {deployment_id} not found")
+    if deployment is None:
+        raise Exception(f"Deployment with id {deployment_id} not found")
 
     return deployment
 
 
-async def find_by_status(status: QuestDbDeploymentStatus) -> list[QuestDbDeployment]:
+async def find_not_in_statuses(statuses: list[QuestDbDeploymentStatus]) -> list[QuestDbDeployment]:
     values: list[QuestDbDeployment] = list(deployments.values())
-    status_filter: Callable[[QuestDbDeployment], bool] = lambda deployment: deployment.status == status
+    status_filter: Callable[[QuestDbDeployment], bool] = lambda deployment: deployment.status not in statuses
 
     return list(filter(status_filter, values))
 
@@ -34,7 +35,7 @@ async def update_status(deployment_id: UUID, status: QuestDbDeploymentStatus) ->
     if deployment is None:
         raise Exception(f"Deployment with id {deployment_id} not found")
 
-    updated_deployment = replace(deployment, status=status)
+    updated_deployment = replace(deployment, status=status, status_log=[status, *deployment.status_log])
     deployments[deployment_id] = updated_deployment
 
     return updated_deployment

@@ -1,6 +1,7 @@
 from copy import deepcopy
 
 from kubernetes_asyncio.client import V1Service
+from kubernetes_asyncio.client.exceptions import ApiException
 
 from models.k8s.service.K8sService import K8sService
 from models.k8s.service.K8sServiceConfig import K8sServiceConfig
@@ -18,5 +19,16 @@ async def create(namespace: str) -> K8sService:
                       config=K8sServiceConfig(node_port=str(response.spec.ports[0].node_port)))
 
 
-async def read(namespace: str, service_id: str) -> K8sService:
-    raise Exception("Not implemented")
+async def refresh(namespace: str, service: K8sService | None) -> K8sService | None:
+    if service is None: return None
+
+    core_client = get_core_client()
+    try:
+        await core_client.read_namespaced_service(service.id, namespace)
+    except ApiException as error:
+        if error.status == 404:
+            return None
+        else:
+            raise error
+
+    return service

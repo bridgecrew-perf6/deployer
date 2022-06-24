@@ -1,6 +1,7 @@
 from copy import deepcopy
 
 from kubernetes_asyncio.client import V1PersistentVolumeClaim
+from kubernetes_asyncio.client.exceptions import ApiException
 
 from models.k8s.volume_claim.K8sVolumeClaim import K8sVolumeClaim
 from models.k8s.volume_claim.K8sVolumeClaimConfig import K8sVolumeClaimConfig
@@ -18,5 +19,15 @@ async def create(namespace: str, config: K8sVolumeClaimConfig) -> K8sVolumeClaim
     return K8sVolumeClaim(id=response.metadata.name, config=config)
 
 
-async def read(namespace: str, claim_id: str) -> K8sVolumeClaim:
-    raise Exception("Not implemented")
+async def refresh(namespace: str, claim: K8sVolumeClaim | None) -> K8sVolumeClaim | None:
+    if claim is None: return None
+
+    core_client = get_core_client()
+    try:
+        await core_client.read_namespaced_persistent_volume_claim(claim.id, namespace)
+    except ApiException as error:
+        if error.status == 404:
+            return None
+        else: raise error
+
+    return claim
